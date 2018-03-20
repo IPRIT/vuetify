@@ -153,3 +153,25 @@ export function filterChildren (array = [], tag) {
       child.componentOptions.Ctor.options.name === tag
   })
 }
+
+export function getElementOffset (element) {
+  if (!element || typeof window === 'undefined') {
+    return { top: 0, left: 0 };
+  }
+
+  // Return zeros for disconnected and hidden (display: none) elements
+  // Support: IE <= 11 only
+  // Running getBoundingClientRect on a
+  // disconnected node in IE throws an error
+  if (element.getClientRects && !element.getClientRects().length) {
+    return { top: 0, left: 0 };
+  }
+
+  // Get document-relative position by adding viewport scroll to viewport-relative gBCR
+  const rect = element.getBoundingClientRect();
+  const win = element.ownerDocument.defaultView;
+  return {
+    top: rect.top + win.pageYOffset,
+    left: rect.left + win.pageXOffset
+  };
+}
