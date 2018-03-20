@@ -1,5 +1,6 @@
 import { consoleError } from '../../../util/console'
 import * as easingPatterns from '../../../util/easing-patterns'
+import { getElementOffset } from '../../../util/helpers';
 
 const defaults = {
   duration: 500,
@@ -30,18 +31,21 @@ function isVueComponent (obj) {
 }
 
 function getTargetLocation (target, settings) {
-  let location
+  let location = 0;
 
   if (target instanceof Element) {
-    location = target.offsetTop
+    location = target.offsetTop;
   } else if (isVueComponent(target)) {
-    location = target.$el.offsetTop
+    location = getElementOffset(target.$el).top;
   } else if (typeof target === 'string') {
-    location = document.querySelector(target).offsetTop
+    const element = document.querySelector(target);
+    if (element) {
+      location = getElementOffset(element).top;
+    }
   } else if (typeof target === 'number') {
-    location = target
+    location = target;
   } else {
-    return undefined
+    location = undefined;
   }
 
   return Math.round(
@@ -49,7 +53,7 @@ function getTargetLocation (target, settings) {
       Math.max(location + settings.offset, 0),
       getDocumentHeight() - getWindowHeight()
     )
-  )
+  );
 }
 
 export default function goTo (target, options) {
